@@ -9,6 +9,7 @@ import (
 	"go-boilerplate/internal/repositories"
 	"go-boilerplate/internal/services"
 	"go-boilerplate/internal/transports/http"
+	"go-boilerplate/internal/validation"
 	"log"
 	"os"
 	"time"
@@ -54,6 +55,8 @@ func (a *App) Run(ctx context.Context, mode Mode) error {
 	}
 	a.Logger.Info("connected to database successfully")
 
+	v := validation.GetValidator()
+
 	// Initialize Example repositories and services
 	repo := repositories.NewExampleRepository(pool)
 	//add more repositories if needed
@@ -62,7 +65,7 @@ func (a *App) Run(ctx context.Context, mode Mode) error {
 	// This is where the application services are registered.
 	// The services are responsible for handling business logic and interacting with repositories.
 	serviceRegister := services.Register{
-		ExampleService: services.NewExampleService(repo, a.Cfg),
+		ExampleService: services.NewExampleService(repo, a.Logger, a.Cfg, v),
 		// add more services to the service register if needed
 	}
 

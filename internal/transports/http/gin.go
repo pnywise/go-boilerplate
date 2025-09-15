@@ -14,8 +14,7 @@ import (
 // The Server struct encapsulates the Gin engine and the services it uses, allowing for a clean separation of concerns.
 // This structure makes it easier to manage dependencies and maintain the codebase.
 type Server struct {
-	eng      *gin.Engine
-	services services.Register
+	eng *gin.Engine
 }
 
 // NewHTTPServer initializes a new HTTP server with the provided services.
@@ -34,7 +33,7 @@ func NewHTTPServer(svcs services.Register) *Server {
 	// Load application routes
 	RegisterRoutes(r, svcs)
 
-	return &Server{eng: r, services: svcs}
+	return &Server{eng: r}
 }
 
 // Run starts the HTTP server and listens for incoming requests.

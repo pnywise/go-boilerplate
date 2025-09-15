@@ -8,6 +8,7 @@ import (
 	"go-boilerplate/internal/repositories"
 
 	"github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
 )
 
 // ExampleService defines the interface for example-related business logic.
@@ -17,8 +18,9 @@ type ExampleService interface {
 
 type exampleService struct {
 	exampleRepo repositories.ExampleRepository
-	validator   *validator.Validate
 	cfg         configs.Config
+	log         *zap.Logger
+	v           *validator.Validate
 }
 
 // NewExampleService creates a new instance of ExampleService.
@@ -27,16 +29,17 @@ type exampleService struct {
 // It uses the repository to interact with the database and the validator for input validation.
 // The ExampleService interface defines the methods that the service should implement.
 // This allows for easier testing and flexibility in implementation.
-func NewExampleService(r repositories.ExampleRepository, cfg configs.Config) ExampleService {
+func NewExampleService(r repositories.ExampleRepository, log *zap.Logger, cfg configs.Config, v *validator.Validate) ExampleService {
 	return &exampleService{
 		exampleRepo: r,
-		validator:   validator.New(),
 		cfg:         cfg,
+		log:         log,
+		v:           v,
 	}
 }
 
 func (s *exampleService) CreateExample(ctx context.Context, o exampledtos.ExampleDTO) (int64, error) {
-	if err := s.validator.Struct(o); err != nil {
+	if err := s.v.Struct(o); err != nil {
 		return 0, err
 	}
 	// Convert DTO to entity

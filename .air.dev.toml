@@ -1,0 +1,21 @@
+# .air.toml
+# Config file for air: https://github.com/cosmtrek/air
+
+# The root directory of your project.
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/main ./cmd/main.go"
+
+full_bin = "tmp/main --mode http --stage dev"
+
+# Watch these file extensions.
+include_ext = ["go"]
+
+# Ignore these directories.
+exclude_dir = ["tmp", "vendor"]
+
+[log]
+# Show log time.
+time = true

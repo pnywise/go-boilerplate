@@ -15,16 +15,16 @@ import (
 // The handler methods are responsible for binding request data, validating it, and calling the service methods.
 // This approach promotes separation of concerns and makes the code more maintainable.
 type ExampleHandler struct {
-	exampleService services.ExampleService // This should be the interface type for the service
+	exampleSrv services.ExampleService // This should be the interface type for the service
 }
 
 // NewExampleHandler creates a new ExampleHandler with the provided ExampleService.
 // It initializes the handler with the service, allowing it to handle HTTP requests related to examples.
 // The handler methods will use this service to perform business logic operations.
 // This approach promotes separation of concerns and makes the code more maintainable.
-func NewExampleHandler(exampleService services.ExampleService) *ExampleHandler {
+func NewExampleHandler(exampleSrv services.ExampleService) *ExampleHandler {
 	return &ExampleHandler{
-		exampleService: exampleService,
+		exampleSrv: exampleSrv,
 	}
 }
 
@@ -40,7 +40,7 @@ func (h *ExampleHandler) CreateExample(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
 	defer cancel()
 
-	id, err := h.exampleService.CreateExample(ctx, in)
+	id, err := h.exampleSrv.CreateExample(ctx, in)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

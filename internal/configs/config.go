@@ -76,16 +76,16 @@ func MustLoad(mode, stage string) Config {
 		Mode: mode,
 
 		// Rabbit defaults
-		RabbitURL:         getenv("RABBIT_URL", "amqp://guest:guest@localhost:5672/"),
-		RabbitExchange:    getenv("RABBIT_EXCHANGE", "app.events"),
-		RabbitQueue:       getenv("RABBIT_QUEUE", "orders.q"),
-		RabbitRoutingKeys: splitCSVDefault(getenv("RABBIT_ROUTING_KEYS", ""), []string{"dwh.*", "#"}),
-		RabbitPrefetch:    getenvInt("RABBIT_PREFETCH", 16),
+		// RabbitURL:         getenv("RABBIT_URL", "amqp://guest:guest@localhost:5672/"),
+		// RabbitExchange:    getenv("RABBIT_EXCHANGE", "app.events"),
+		// RabbitQueue:       getenv("RABBIT_QUEUE", "orders.q"),
+		// RabbitRoutingKeys: splitCSVDefault(getenv("RABBIT_ROUTING_KEYS", ""), []string{"dwh.*", "#"}),
+		// RabbitPrefetch:    getenvInt("RABBIT_PREFETCH", 16),
 
-		RabbitRetryTTLMS:      getenvInt("RABBIT_RETRY_TTL_MS", 15000),
-		RabbitMaxRedeliveries: getenvInt("RABBIT_MAX_REDELIVERIES", 5),
-		RabbitDLX:             getenv("RABBIT_DLX", "app.dlx"),
-		RabbitRetryExchange:   getenv("RABBIT_RETRY_EXCHANGE", "app.retry"),
+		// RabbitRetryTTLMS:      getenvInt("RABBIT_RETRY_TTL_MS", 15000),
+		// RabbitMaxRedeliveries: getenvInt("RABBIT_MAX_REDELIVERIES", 5),
+		// RabbitDLX:             getenv("RABBIT_DLX", "app.dlx"),
+		// RabbitRetryExchange:   getenv("RABBIT_RETRY_EXCHANGE", "app.retry"),
 
 		// DB (optional)
 		DbUser:            getenv("DB_USER", ""),
@@ -109,7 +109,7 @@ func MustLoad(mode, stage string) Config {
 
 		BISPAKEToken: getenv("BISPAKETOKEN", ""),
 
-		AppName:  getenv("APP_NAME", "rmq-consumer"),
+		AppName:  getenv("APP_NAME", "example"),
 		HTTPAddr: getenv("HTTP_ADDR", ":8080"),
 		GrpcAddr: getenv("GRPC_ADDR", ":9090"),
 	}
@@ -130,8 +130,7 @@ func MustLoad(mode, stage string) Config {
 		requireNonEmpty("HTTP_ADDR", cfg.HTTPAddr)
 	}
 
-	log.Printf("config loaded: stage=%s mode=%s exchange=%s queue=%s keys=%v",
-		stage, cfg.Mode, cfg.RabbitExchange, cfg.RabbitQueue, cfg.RabbitRoutingKeys)
+	log.Printf("config loaded: stage=%s mode=%s", stage, cfg.Mode)
 
 	return cfg
 }

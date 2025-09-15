@@ -20,6 +20,7 @@ type ExampleRepository interface {
 
 type exampleRepository struct {
 	db *sql.DB
+	
 }
 // NewExampleRepository creates a new instance of ExampleRepository using the provided database connection.
 // It is responsible for interacting with the database to perform CRUD operations on ExampleEntity.
