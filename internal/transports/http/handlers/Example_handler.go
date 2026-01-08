@@ -1,11 +1,9 @@
 package handlers
 
 import (
-	"context"
 	exampledtos "go-boilerplate/internal/dtos/example_dtos"
 	"go-boilerplate/internal/services"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,10 +35,7 @@ func (h *ExampleHandler) CreateExample(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
-	defer cancel()
-
-	id, err := h.exampleSrv.CreateExample(ctx, in)
+	id, err := h.exampleSrv.CreateExample(c.Request.Context(), in)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
