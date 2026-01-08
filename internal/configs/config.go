@@ -64,7 +64,6 @@ type Config struct {
 // and validates the configuration based on the selected mode.
 // If any required fields are missing, it panics with an error message.
 func MustLoad(mode, stage string) Config {
-	// ---- 2) Load dotenv file based on stage (no viper) ----
 	envFile := ".env"
 	if stage != "" {
 		envFile = fmt.Sprintf(".env.stage.%s", stage)
@@ -114,7 +113,6 @@ func MustLoad(mode, stage string) Config {
 		GrpcAddr: getenv("GRPC_ADDR", ":9090"),
 	}
 
-	// ---- 4) Validate ONLY what the selected mode needs ----
 	switch cfg.Mode {
 	case "http":
 		requireNonEmpty("HTTP_ADDR", cfg.HTTPAddr)
@@ -134,8 +132,6 @@ func MustLoad(mode, stage string) Config {
 
 	return cfg
 }
-
-// --- helpers ---
 
 func loadDotenvIfPresent(filename string) {
 	cwd, _ := os.Getwd()

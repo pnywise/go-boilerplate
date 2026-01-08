@@ -40,6 +40,14 @@ dev: ## 🚀 Run the application in development mode (with hot-reload)
 	@echo "Install with: go install github.com/air-verse/air@latest"
 	@air -c .air.dev.toml
 
+test: ## 🧪 Run all tests
+	@echo "Running tests..."
+	@$(GO) test ./... -v -coverprofile=coverage.out
+
+coverage: ## 🧪 coverage report
+	@echo "Running tests..."
+	@$(GO) tool cover -html=coverage.out
+
 local: ## 🚀 Run the application in local mode (with hot-reload)
 	@echo "Starting dev server with hot-reload (requires 'air')..."
 	@echo "Install with: go install github.com/air-verse/air@latest"

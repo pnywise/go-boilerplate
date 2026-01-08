@@ -3,6 +3,7 @@ package http
 import (
 	"go-boilerplate/internal/services"
 	"go-boilerplate/internal/transports/http/handlers"
+	middewares "go-boilerplate/internal/transports/http/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +18,7 @@ func RegisterRoutes(r *gin.Engine, svcs services.Register) {
 	// add more handlers if needed
 
 	// Define the routes for the example module
-	exampleRoute := r.Group("/example")
+	exampleRoute := r.Group("/example", middewares.BasicAuthMiddleware())
 	{
 		// Users
 		exampleRoute.POST("/", exampleHandler.CreateExample)
