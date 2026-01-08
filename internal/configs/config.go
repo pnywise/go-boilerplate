@@ -18,6 +18,10 @@ import (
 type Config struct {
 	Mode string
 
+	// Basic Auth
+	BasicAuthUser string
+	BasicAuthPass string
+
 	// Rabbit
 	RabbitURL         string
 	RabbitExchange    string

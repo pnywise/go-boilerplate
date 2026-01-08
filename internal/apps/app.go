@@ -71,7 +71,7 @@ func (a *App) Run(ctx context.Context, mode Mode) error {
 
 	switch mode {
 	case ModeHTTP:
-		h := http.NewHTTPServer(serviceRegister)
+		h := http.NewHTTPServer(serviceRegister, a.Cfg)
 		// Start the HTTP server with the provided context and address from the configuration.
 		// The server will listen for incoming HTTP requests and handle them using the registered routes.
 		a.Logger.Info("starting HTTP server", zap.String("address", a.Cfg.HTTPAddr))
