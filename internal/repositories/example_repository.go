@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"go-boilerplate/internal/entities"
-	"time"
 )
 
 // ExampleRepository defines the interface for interacting with the ExampleEntity in the database.
@@ -20,8 +19,8 @@ type ExampleRepository interface {
 
 type exampleRepository struct {
 	db *sql.DB
-	
 }
+
 // NewExampleRepository creates a new instance of ExampleRepository using the provided database connection.
 // It is responsible for interacting with the database to perform CRUD operations on ExampleEntity.
 func NewExampleRepository(db *sql.DB) ExampleRepository {
@@ -29,9 +28,6 @@ func NewExampleRepository(db *sql.DB) ExampleRepository {
 }
 
 func (r *exampleRepository) GetByID(ctx context.Context, id int64) (*entities.ExampleEntity, error) {
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
-	defer cancel()
-
 	row := r.db.QueryRowContext(ctx, `SELECT id, user_id, amount FROM users WHERE id = $1`, id)
 	var u entities.ExampleEntity
 	if err := row.Scan(&u.ID, &u.UserID, &u.Amount); err != nil {
@@ -44,9 +40,6 @@ func (r *exampleRepository) GetByID(ctx context.Context, id int64) (*entities.Ex
 }
 
 func (r *exampleRepository) Create(ctx context.Context, u *entities.ExampleEntity) (int64, error) {
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
-	defer cancel()
-
 	var id int64
 	err := r.db.QueryRowContext(ctx,
 		`INSERT INTO users (user_id, amount) VALUES ($1, $2) RETURNING id`,
