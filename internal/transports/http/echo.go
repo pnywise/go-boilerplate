@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 )
 
 // Server holds the Gin engine and services for the HTTP server.
@@ -15,7 +16,7 @@ import (
 // The Server struct encapsulates the Gin engine and the services it uses, allowing for a clean separation of concerns.
 // This structure makes it easier to manage dependencies and maintain the codebase.
 type Server struct {
-	eng *gin.Engine
+	eng *echo.Echo
 }
 
 // NewHTTPServer initializes a new HTTP server with the provided services.
@@ -23,12 +24,12 @@ type Server struct {
 // The server is ready to handle incoming HTTP requests.
 // The health check route is also defined here for basic server health monitoring.
 func NewHTTPServer(svcs services.Register, cfg configs.Config) *Server {
-	r := gin.New()
-	r.Use(gin.Recovery())
+	r := echo.New()
+	r.Use(middleware.Recover())
 
 	// Health route stays here
-	r.GET("/healthz", func(c *gin.Context) {
-		c.String(http.StatusOK, "ok")
+	r.GET("/healthz", func(c *echo.Context) error {
+		return c.String(http.StatusOK, "ok")
 	})
 
 	// Load application routes

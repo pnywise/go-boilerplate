@@ -6,11 +6,11 @@ import (
 	"go-boilerplate/internal/transports/http/handlers"
 	middewares "go-boilerplate/internal/transports/http/middlewares"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v5"
 )
 
 // RegisterRoutes sets up all API routes grouped by version/module
-func RegisterRoutes(r *gin.Engine, svcs services.Register, cfg configs.Config) {
+func RegisterRoutes(r *echo.Echo, svcs services.Register, cfg configs.Config) {
 	// inisiate ExampleHandler with the ExampleService from services.Register
 	// This allows the handler to use the service for business logic operations.
 	// The handler methods will call the service methods to perform actions like creating, updating, or deleting examples.

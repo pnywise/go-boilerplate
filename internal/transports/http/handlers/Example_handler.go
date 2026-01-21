@@ -5,7 +5,7 @@ import (
 	"go-boilerplate/internal/services"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v5"
 )
 
 // ExampleHandler handles HTTP requests related to examples.
@@ -29,18 +29,17 @@ func NewExampleHandler(exampleSrv services.ExampleService) *ExampleHandler {
 // CreateExample handles the HTTP POST request to create a new example entity.
 // It binds the incoming JSON request to an ExampleDTO, validates it, and calls the service to create the entity.
 // If successful, it returns a 201 Created response with the new entity's ID.
-func (h *ExampleHandler) CreateExample(c *gin.Context) {
+func (h *ExampleHandler) CreateExample(c *echo.Context) error {
 	var in exampledtos.ExampleDTO
-	if err := c.BindJSON(&in); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	if err := c.Bind(&in); err != nil {
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	id, err := h.exampleSrv.CreateExample(c.Request.Context(), in)
+	id, err := h.exampleSrv.CreateExample(c.Request().Context(), in)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, map[string]int64{"id": id})
+	return nil
 }
 
 // Add methods to handle HTTP requests, such as CreateExample, UpdateExample, etc.
