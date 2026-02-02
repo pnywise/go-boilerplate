@@ -69,14 +69,19 @@ func newBulkSink(cli *elasticsearch.Client, index string, maxBytes int, interval
 }
 
 func (b *bulkSink) loop() {
-	ticker := time.NewTicker(b.interval)
-	defer ticker.Stop()
+	var ticker *time.Ticker
+	var tickCh <-chan time.Time
+	if b.interval > 0 {
+		ticker = time.NewTicker(b.interval)
+		tickCh = ticker.C
+		defer ticker.Stop()
+	}
 	for {
 		select {
 		case <-b.ctx.Done():
 			b.flush()
 			return
-		case <-ticker.C:
+		case <-tickCh:
 			b.flush()
 		case <-b.flushCh:
 			b.flush()
@@ -124,6 +129,7 @@ type elasticCore struct {
 	enc  zapcore.Encoder
 	sink *bulkSink
 	lvl  zapcore.LevelEnabler
+	withFields []zapcore.Field
 }
 
 func newElasticCore(enc zapcore.Encoder, sink *bulkSink, lvl zapcore.LevelEnabler) zapcore.Core {
@@ -136,6 +142,8 @@ func (c *elasticCore) Enabled(l zapcore.Level) bool {
 
 func (c *elasticCore) With(fields []zapcore.Field) zapcore.Core {
 	clone := *c
+	// append persistent fields to be included on each Write
+	clone.withFields = append(append([]zapcore.Field(nil), c.withFields...), fields...)
 	return &clone
 }
 
@@ -147,7 +155,9 @@ func (c *elasticCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcor
 }
 
 func (c *elasticCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	buf, err := c.enc.EncodeEntry(ent, fields)
+	// combine fields from logger.With and this call
+	all := append(append([]zapcore.Field(nil), c.withFields...), fields...)
+	buf, err := c.enc.EncodeEntry(ent, all)
 	if err != nil {
 		return err
 	}
@@ -231,7 +241,9 @@ func NewWithElastic(serviceName string, tzName string, es ESOpts) (*zap.Logger, 
 	)
 
 	cores := []zapcore.Core{stdoutCore}
-	stopper := func() {}
+	stopper := func() {
+		// no-op stopper: when Elasticsearch logging is disabled, there are no resources to clean up
+	}
 
 	if es.Enabled {
 		cfg := elasticsearch.Config{Addresses: es.Addresses}

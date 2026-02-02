@@ -28,7 +28,7 @@ func NewExampleRepository(db *sql.DB) ExampleRepository {
 }
 
 func (r *exampleRepository) GetByID(ctx context.Context, id int64) (*entities.ExampleEntity, error) {
-	row := r.db.QueryRowContext(ctx, `SELECT id, user_id, amount FROM users WHERE id = $1`, id)
+	row := r.db.QueryRowContext(ctx, `SELECT id, user_id, amount FROM users WHERE id = ?`, id)
 	var u entities.ExampleEntity
 	if err := row.Scan(&u.ID, &u.UserID, &u.Amount); err != nil {
 		if err == sql.ErrNoRows {
@@ -40,10 +40,16 @@ func (r *exampleRepository) GetByID(ctx context.Context, id int64) (*entities.Ex
 }
 
 func (r *exampleRepository) Create(ctx context.Context, u *entities.ExampleEntity) (int64, error) {
-	var id int64
-	err := r.db.QueryRowContext(ctx,
-		`INSERT INTO users (user_id, amount) VALUES ($1, $2) RETURNING id`,
+	res, err := r.db.ExecContext(ctx,
+		`INSERT INTO users (user_id, amount) VALUES (?, ?)`,
 		u.UserID, u.Amount,
-	).Scan(&id)
-	return id, err
+	)
+	if err != nil {
+		return 0, err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }

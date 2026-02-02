@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/dbs"
-	"go-boilerplate/internal/utils/logs"
 	"go-boilerplate/internal/repositories"
 	"go-boilerplate/internal/services"
 	"go-boilerplate/internal/transports/http"
+	"go-boilerplate/internal/utils/logs"
 	"go-boilerplate/internal/utils/validation"
 	"log"
 	"os"
@@ -44,16 +44,19 @@ const (
 type App struct {
 	Cfg    configs.Config
 	Logger *zap.Logger
+	stopLog func()
 }
 
 // Run initializes the application based on the provided mode and context.
 func (a *App) Run(ctx context.Context, mode Mode) error {
-	pool, _err := dbs.NewMySQLDB(a.Cfg)
-	if condition := _err != nil; condition {
-		a.Logger.Error("failed to connect to database", zap.Error(_err))
-		return fmt.Errorf("failed to connect to database: %w", _err)
+	defer a.Close()
+	pool, err := dbs.NewMySQLDB(a.Cfg)
+	if condition := err != nil; condition {
+		a.Logger.Error("failed to connect to database", zap.Error(err))
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	a.Logger.Info("connected to database successfully")
+	defer pool.Close()
 
 	v := validation.GetValidator()
 
@@ -111,13 +114,16 @@ func New(cfg configs.Config) (*App, error) {
 	if err != nil {
 		log.Fatalf("failed to init logger: %v", err)
 	}
-	defer func() {
-		stopES()
-		_ = logger.Sync()
-	}()
 
-	if err != nil {
-		return nil, err
+	return &App{Cfg: cfg, Logger: logger, stopLog: stopES}, nil
+}
+
+// Close releases application resources like logger sinks.
+func (a *App) Close() {
+	if a.stopLog != nil {
+		a.stopLog()
 	}
-	return &App{Cfg: cfg, Logger: logger}, nil
+	if a.Logger != nil {
+		_ = a.Logger.Sync()
+	}
 }

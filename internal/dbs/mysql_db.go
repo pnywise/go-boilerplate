@@ -37,8 +37,15 @@ func NewMySQLDB(cfg configs.Config) (*sql.DB, error) {
 	db.SetMaxOpenConns(cfg.DbMaxOpenConns)
 	db.SetMaxIdleConns(cfg.DbMaxIdleConns)
 
-	jitter := time.Duration(rand.Intn(5)) * time.Minute
-	db.SetConnMaxLifetime(time.Duration(cfg.DbConnMaxLifetime)*time.Minute - jitter)
+	base := time.Duration(cfg.DbConnMaxLifetime) * time.Minute
+	if base > 0 {
+		// add small jitter but never go negative
+		j := time.Duration(rand.Intn(5)) * time.Minute
+		if j < base {
+			base -= j
+		}
+	}
+	db.SetConnMaxLifetime(base)
 	db.SetConnMaxIdleTime(10 * time.Minute)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

@@ -14,7 +14,7 @@ import (
     "go.uber.org/zap"
 )
 
-func TestCreateExample_Success(t *testing.T) {
+func TestCreateExampleSuccess(t *testing.T) {
     mockRepo := &_mock.MockExampleRepository{
         CreateFunc: func(ctx context.Context, u *entities.ExampleEntity) (int64, error) {
             return 7, nil
@@ -33,7 +33,7 @@ func TestCreateExample_Success(t *testing.T) {
     require.Equal(t, int64(7), id)
 }
 
-func TestCreateExample_PassesEntityToRepo(t *testing.T) {
+func TestCreateExamplePassesEntityToRepo(t *testing.T) {
     var captured *entities.ExampleEntity
     mockRepo := &_mock.MockExampleRepository{
         CreateFunc: func(ctx context.Context, u *entities.ExampleEntity) (int64, error) {
